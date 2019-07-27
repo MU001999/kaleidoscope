@@ -100,18 +100,16 @@ Token Lexer::next()
             return next();
         }
     }
+
+    if (last_char_ == EOF)
+    {
+        return Token(Token::END);
+    }
     else
     {
-        if (last_char_ == EOF)
-        {
-            return Token(Token::END);
-        }
-        else
-        {
-            int this_char = last_char_;
-            last_char_ = getchar();
-            return Token(this_char);
-        }
+        int this_char = last_char_;
+        last_char_ = getchar();
+        return Token(this_char);
     }
 }
 } // namespace kaleidoscope
