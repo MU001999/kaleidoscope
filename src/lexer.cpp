@@ -18,7 +18,7 @@ const unordered_map<string, Token::Type> symbols
 
 namespace kaleidoscope
 {
-Token::Token(Type type, string value)
+Token::Token(int type, string value)
   : type_(type), value_(move(value))
 {
     // ...
@@ -29,7 +29,7 @@ Token::operator bool() const
     return type_ != ERR && type_ != END;
 }
 
-Token::Type Token::type() const
+int Token::type() const
 {
     return type_;
 }
@@ -108,8 +108,9 @@ Token Lexer::next()
         }
         else
         {
+            int this_char = last_char_;
             last_char_ = getchar();
-            return Token(Token::ERR);
+            return Token(this_char);
         }
     }
 }

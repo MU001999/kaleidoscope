@@ -11,32 +11,32 @@ class Token
     enum Type
     {
         // commands
-        DEF,
-        EXTERN,
+        DEF = -1,
+        EXTERN = -2,
 
         // primary
-        IDENTIFIER,
-        NUMBER,
+        IDENTIFIER = -3,
+        NUMBER = -4,
 
-        ERR,
-        END
+        ERR = -5,
+        END = -6
     };
 
     Token() = default;
     ~Token() = default;
 
-    Token(Type type, std::string value = "");
+    Token(int type, std::string value = "");
 
     // operator bool()
     // return false if type is ERR or END else true
     operator bool() const;
     // return type of current token
-    Type type() const;
+    int type() const;
     // return value of current token
     std::string value() const;
 
   private:
-    Type type_;
+    int type_;
     std::string value_;
 };
 
