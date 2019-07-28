@@ -29,9 +29,6 @@ class Parser
     Token get_next_token();
 
   private:
-    std::unique_ptr<ExprAST> log_error(const char *str);
-    std::unique_ptr<PrototypeAST> log_error_p(const char *str);
-
     template <size_t precedence = 0>
     std::unique_ptr<ExprAST> parse_expression()
     {

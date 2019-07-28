@@ -10,18 +10,6 @@ using namespace std;
 
 namespace kaleidoscope
 {
-unique_ptr<ExprAST> Parser::log_error(const char *str)
-{
-    fprintf(stderr, "LogError: %s\n", str);
-    return nullptr;
-}
-
-unique_ptr<PrototypeAST> Parser::log_error_p(const char *str)
-{
-    log_error(str);
-    return nullptr;
-}
-
 void Parser::main_loop()
 {
     fprintf(stderr, "ready> ");
