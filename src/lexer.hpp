@@ -18,7 +18,6 @@ class Token
         IDENTIFIER = -3,
         NUMBER = -4,
 
-        ERR = -5,
         END = -6
     };
 

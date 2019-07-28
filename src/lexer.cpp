@@ -26,7 +26,7 @@ Token::Token(int type, string value)
 
 Token::operator bool() const
 {
-    return type_ != ERR && type_ != END;
+    return type_ != END;
 }
 
 int Token::type() const
