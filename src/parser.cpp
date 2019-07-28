@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <string>
 #include <vector>
 #include <utility>
@@ -6,11 +7,6 @@
 #include "parser.hpp"
 
 using namespace std;
-
-namespace
-{
-
-} // namespace
 
 namespace kaleidoscope
 {
@@ -32,7 +28,8 @@ void Parser::main_loop()
     get_next_token();
     while (true)
     {
-        switch (cur_token_)
+        fprintf(stderr, "ready> ");
+        switch (cur_token_.type())
         {
         case Token::END:
             return;
@@ -49,7 +46,6 @@ void Parser::main_loop()
             handle_top_level_expression();
             break;
         }
-        fprintf(stderr, "ready> ");
     }
 }
 
@@ -58,14 +54,19 @@ Token Parser::get_next_token()
     return cur_token_ = lexer_.next();
 }
 
-unique_ptr<ExprAST> Parser::parse_expression()
-{
-
-}
-
 unique_ptr<ExprAST> Parser::parse_primary()
 {
-
+    switch (cur_token_.type())
+    {
+    case Token::IDENTIFIER:
+        return parse_identifier_expr();
+    case Token::NUMBER:
+        return parse_number_expr();
+    case '(':
+        return parse_paren_expr();
+    default:
+        return log_error("unknown token when expecting an expression");
+    }
 }
 
 unique_ptr<ExprAST> Parser::parse_number_expr()
@@ -77,46 +78,147 @@ unique_ptr<ExprAST> Parser::parse_number_expr()
 
 unique_ptr<ExprAST> Parser::parse_paren_expr()
 {
-
+    get_next_token();
+    auto val = parse_expression();
+    if (!val)
+    {
+        return nullptr;
+    }
+    if (cur_token_.type() != ')')
+    {
+        return log_error("expected ')'");
+    }
+    get_next_token();
+    return val;
 }
 
 unique_ptr<ExprAST> Parser::parse_identifier_expr()
 {
+    auto name = cur_token_.value();
+    get_next_token();
+    if (cur_token_.type() != '(')
+    {
+        return make_unique<VariableExprAST>(name);
+    }
 
+    get_next_token();
+    vector<unique_ptr<ExprAST>> args;
+    if (cur_token_.type() != ')')
+    {
+        while (true)
+        {
+            if (auto arg = parse_expression())
+            {
+                args.push_back(move(arg));
+            }
+            else
+            {
+                return nullptr;
+            }
+            if (cur_token_.type() == ')')
+            {
+                break;
+            }
+            if (cur_token_.type() != ',')
+            {
+                return log_error("Expected ')' or ',' in argument list");
+            }
+            get_next_token();
+        }
+    }
+    get_next_token();
+    return make_unique<CallExprAST>(name, move(args));
 }
 
 unique_ptr<PrototypeAST> Parser::parse_extern()
 {
-
+    get_next_token();
+    return parse_prototype();
 }
 
 unique_ptr<PrototypeAST> Parser::parse_prototype()
 {
-
+    if (cur_token_.type() != Token::IDENTIFIER)
+    {
+        return log_error_p("Expected function name in prototype");
+    }
+    auto name = cur_token_.value();
+    get_next_token();
+    if (cur_token_.type() != '(')
+    {
+        return log_error_p("expected '(' in prototype");
+    }
+    vector<string> args;
+    while (get_next_token().type() == Token::IDENTIFIER)
+    {
+        args.push_back(cur_token_.value());
+    }
+    if (cur_token_.type() != ')')
+    {
+        return log_error_p("Expected ')' in prototype");
+    }
+    get_next_token();
+    return make_unique<PrototypeAST>(name, move(args));
 }
 
 unique_ptr<FunctionAST> Parser::parse_definition()
 {
-
+    get_next_token();
+    auto proto = parse_prototype();
+    if (!proto)
+    {
+        return nullptr;
+    }
+    if (auto expr = parse_expression())
+    {
+        return make_unique<FunctionAST>(move(proto), move(expr));
+    }
+    return nullptr;
 }
 
 unique_ptr<FunctionAST> Parser::parse_top_level_expr()
 {
-
+    if (auto expr = parse_expression())
+    {
+        auto proto = make_unique<PrototypeAST>("__anno_expr", vector<string>());
+        return make_unique<FunctionAST>(move(proto), move(expr));
+    }
+    return nullptr;
 }
 
 void Parser::handle_definition()
 {
-
+    if (parse_definition())
+    {
+        fprintf(stderr, "Parsed a function definition\n");
+    }
+    else
+    {
+        get_next_token();
+    }
 }
 
 void Parser::handle_extern()
 {
-
+    if (parse_extern())
+    {
+        fprintf(stderr, "Parsed an extern\n");
+    }
+    else
+    {
+        get_next_token();
+    }
 }
 
 void Parser::handle_top_level_expression()
 {
-
+    if (parse_top_level_expr())
+    {
+        fprintf(stderr, "Parsed a top-level expr\n");
+    }
+    else
+    {
+        get_next_token();
+    }
 }
 } // namespace kaleidoscope
