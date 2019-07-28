@@ -18,7 +18,7 @@ class Token
         IDENTIFIER = -3,
         NUMBER = -4,
 
-        END = -6
+        END = -5
     };
 
     Token() = default;
