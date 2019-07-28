@@ -8,9 +8,6 @@ using namespace kaleidoscope;
 
 int main()
 {
-    Parser parser;
-    fprintf(stderr, "ready> ");
-    parser.get_next_token();
-    parser.main_loop();
+    Parser().main_loop();
     return 0;
 }
