@@ -56,4 +56,32 @@ class CallExprAST : public ExprAST
       : callee_(callee), args_(std::move(args)) {}
 };
 
+// PrototypeAST - This class represents the "prototype" for a function,
+// which captures its name, and its argument names (thus implicitly the number
+// of arguments the function takes).
+class PrototypeAST
+{
+    std::string name_;
+    std::vector<std::string> args_;
+
+  public:
+    PrototypeAST(const std::string &name,
+        std::vector<std::string> args)
+      : name_(name), args_(std::move(args)) {}
+
+    const std::string &get_name() const { return name_; }
+};
+
+// FunctionAST - This class represents a function definition itself.
+class FunctionAST
+{
+    std::unique_ptr<PrototypeAST> proto_;
+    std::unique_ptr<ExprAST> body_;
+
+  public:
+    FunctionAST(std::unique_ptr<PrototypeAST> proto,
+        std::unique_ptr<ExprAST> body)
+      : proto_(std::move(proto)), body_(std::move(body)) {}
+};
+
 #endif // KALEIDOSCOPE_NODE_HPP
