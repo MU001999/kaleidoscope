@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <memory>
 #include <utility>
 #include <unordered_set>
 
@@ -59,7 +60,7 @@ unique_ptr<ExprAST> Parser::parse_primary()
 
 unique_ptr<ExprAST> Parser::parse_number_expr()
 {
-    auto result = make_unique<NumberExprAST>(stod(cur_token_.value()));
+    auto result = std::make_unique<NumberExprAST>(stod(cur_token_.value()));
     get_next_token();
     return result;
 }
@@ -86,7 +87,7 @@ unique_ptr<ExprAST> Parser::parse_identifier_expr()
     get_next_token();
     if (cur_token_.type() != '(')
     {
-        return make_unique<VariableExprAST>(name);
+        return std::make_unique<VariableExprAST>(name);
     }
 
     get_next_token();
@@ -115,7 +116,7 @@ unique_ptr<ExprAST> Parser::parse_identifier_expr()
         }
     }
     get_next_token();
-    return make_unique<CallExprAST>(name, move(args));
+    return std::make_unique<CallExprAST>(name, move(args));
 }
 
 unique_ptr<PrototypeAST> Parser::parse_extern()
@@ -146,7 +147,7 @@ unique_ptr<PrototypeAST> Parser::parse_prototype()
         return log_error_p("Expected ')' in prototype");
     }
     get_next_token();
-    return make_unique<PrototypeAST>(name, move(args));
+    return std::make_unique<PrototypeAST>(name, move(args));
 }
 
 unique_ptr<FunctionAST> Parser::parse_definition()
@@ -159,7 +160,7 @@ unique_ptr<FunctionAST> Parser::parse_definition()
     }
     if (auto expr = parse_expression())
     {
-        return make_unique<FunctionAST>(move(proto), move(expr));
+        return std::make_unique<FunctionAST>(move(proto), move(expr));
     }
     return nullptr;
 }
@@ -168,17 +169,22 @@ unique_ptr<FunctionAST> Parser::parse_top_level_expr()
 {
     if (auto expr = parse_expression())
     {
-        auto proto = make_unique<PrototypeAST>("__anno_expr", vector<string>());
-        return make_unique<FunctionAST>(move(proto), move(expr));
+        auto proto = std::make_unique<PrototypeAST>("__anno_expr", vector<string>());
+        return std::make_unique<FunctionAST>(move(proto), move(expr));
     }
     return nullptr;
 }
 
 void Parser::handle_definition()
 {
-    if (parse_definition())
+    if (auto fn_ast = parse_definition())
     {
-        fprintf(stderr, "Parsed a function definition\n");
+        if (auto fn_ir = fn_ast->codegen())
+        {
+            fprintf(stderr, "Parsed a function definition\n");
+            fn_ir->print(errs());
+            fprintf(stderr, "\n");
+        }
     }
     else
     {
@@ -188,9 +194,14 @@ void Parser::handle_definition()
 
 void Parser::handle_extern()
 {
-    if (parse_extern())
+    if (auto proto_ast = parse_extern())
     {
-        fprintf(stderr, "Parsed an extern\n");
+        if (auto proto_ir = proto_ast->codegen())
+        {
+            fprintf(stderr, "Parsed an extern\n");
+            proto_ir->print(errs());
+            fprintf(stderr, "\n");
+        }
     }
     else
     {
@@ -200,9 +211,14 @@ void Parser::handle_extern()
 
 void Parser::handle_top_level_expression()
 {
-    if (parse_top_level_expr())
+    if (auto fn_ast = parse_definition())
     {
-        fprintf(stderr, "Parsed a top-level expr\n");
+        if (auto fn_ir = fn_ast->codegen())
+        {
+            fprintf(stderr, "Parsed a top-level expr\n");
+            fn_ir->print(errs());
+            fprintf(stderr, "\n");
+        }
     }
     else
     {
