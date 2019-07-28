@@ -45,6 +45,12 @@ inline llvm::Value *log_error_v(const char *str)
     return nullptr;
 }
 
+inline llvm::Function *log_error_f(const char *str)
+{
+    log_error(str);
+    return nullptr;
+}
+
 // ExprAST - Base class for all expression nodes
 class ExprAST
 {

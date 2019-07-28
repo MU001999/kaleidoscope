@@ -69,4 +69,55 @@ Value *CallExprAST::codegen()
     }
     return Builder.CreateCall(callee, args, "calltmp");
 }
+
+Function *PrototypeAST::codegen()
+{
+    std::vector<Type *> doubles(args_.size(), Type::getDoubleTy(TheContext));
+    auto ft = FunctionType::get(Type::getDoubleTy(TheContext), doubles, false);
+    auto f = Function::Create(ft, Function::ExternalLinkage, name_, TheModule.get());
+
+    size_t idx = 0;
+    for (auto &arg : f->args())
+    {
+        arg.setName(args_[idx++]);
+    }
+    return f;
+}
+
+Function *FunctionAST::codegen()
+{
+    auto the_function = TheModule->getFunction(proto_->get_name());
+    if (!the_function)
+    {
+        the_function = proto_->codegen();
+    }
+    if (!the_function)
+    {
+        return nullptr;
+    }
+    if (!the_function->empty())
+    {
+        return log_error_f("Function cannot be redefined");
+    }
+
+    auto bb = BasicBlock::Create(TheContext, "entry", the_function);
+    Builder.SetInsertPoint(bb);
+
+    NamedValues.clear();
+    for (auto &arg : the_function->args())
+    {
+        NamedValues[arg.getName()] = &arg;
+    }
+
+    if (auto ret_val = body_->codegen())
+    {
+        Builder.CreateRet(ret_val);
+        verifyFunction(*the_function);
+
+        return the_function;
+    }
+
+    the_function->eraseFromParent();
+    return nullptr;
+}
 } // namespace kaleidoscope
