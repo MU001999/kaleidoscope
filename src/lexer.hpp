@@ -28,7 +28,7 @@ class Token
 
     // operator bool()
     // return false if type is ERR or END else true
-    operator bool() const;
+    explicit operator bool() const;
     // return type of current token
     int type() const;
     // return value of current token
