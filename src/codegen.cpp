@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include "node.hpp"
 
 using namespace std;

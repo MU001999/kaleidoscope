@@ -11,7 +11,7 @@ namespace kaleidoscope
 namespace details
 {
 constexpr size_t precedences_size = 3;
-const vector<unordered_set<int>> precedences
+const std::vector<std::unordered_set<int>> precedences
 {
     { '<' },
     { '+', '-' },
@@ -44,7 +44,7 @@ class Parser
             {
                 get_next_token();
                 auto rhs = parse_expression<precedence+1>();
-                lhs = make_unique<BinaryExprAST>(op, move(lhs), move(rhs));
+                lhs = std::make_unique<BinaryExprAST>(op, move(lhs), move(rhs));
                 op = cur_token_.type();
             }
             return lhs;

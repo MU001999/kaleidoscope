@@ -1,10 +1,10 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-#include <memory>
 #include <utility>
 #include <unordered_set>
 
+#include "node.hpp"
 #include "parser.hpp"
 
 using namespace std;
@@ -182,7 +182,7 @@ void Parser::handle_definition()
         if (auto fn_ir = fn_ast->codegen())
         {
             fprintf(stderr, "Parsed a function definition\n");
-            fn_ir->print(errs());
+            fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
         }
     }
@@ -199,7 +199,7 @@ void Parser::handle_extern()
         if (auto proto_ir = proto_ast->codegen())
         {
             fprintf(stderr, "Parsed an extern\n");
-            proto_ir->print(errs());
+            proto_ir->print(llvm::errs());
             fprintf(stderr, "\n");
         }
     }
@@ -211,12 +211,12 @@ void Parser::handle_extern()
 
 void Parser::handle_top_level_expression()
 {
-    if (auto fn_ast = parse_definition())
+    if (auto fn_ast = parse_top_level_expr())
     {
         if (auto fn_ir = fn_ast->codegen())
         {
             fprintf(stderr, "Parsed a top-level expr\n");
-            fn_ir->print(errs());
+            fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
         }
     }
