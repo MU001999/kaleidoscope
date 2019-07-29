@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <cassert>
 #include <utility>
 #include <unordered_set>
 
@@ -215,9 +216,20 @@ void Parser::handle_top_level_expression()
     {
         if (auto fn_ir = fn_ast->codegen())
         {
-            fprintf(stderr, "Parsed a top-level expr\n");
+            fprintf(stderr, "Read top-level expression\n");
             fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
+
+            auto h = TheJIT->addModule(move(TheModule));
+            initialize_module_and_pass_manager();
+
+            auto expr_symbol = TheJIT->findSymbol("__anno_expr");
+            assert(expr_symbol && "Function not found");
+
+            auto fp = (double (*)())(intptr_t)expr_symbol.getAddress().get();
+            fprintf(stderr, "Evaluated to %f\n", fp());
+
+            TheJIT->removeModule(h);
         }
     }
     else

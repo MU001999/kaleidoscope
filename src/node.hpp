@@ -8,6 +8,7 @@
 #include <vector>
 #include <utility>
 
+#include "KaleidoscopeJIT.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -23,6 +24,8 @@
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetMachine.h"
 
 namespace kaleidoscope
 {
@@ -30,6 +33,7 @@ inline llvm::LLVMContext TheContext;
 inline llvm::IRBuilder<> Builder(TheContext);
 inline std::unique_ptr<llvm::Module> TheModule;
 inline std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
+inline std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
 inline std::map<std::string, llvm::Value *> NamedValues;
 
 inline std::unique_ptr<class ExprAST> log_error(const char *str)
@@ -59,6 +63,7 @@ inline llvm::Function *log_error_f(const char *str)
 inline void initialize_module_and_pass_manager()
 {
     TheModule = llvm::make_unique<llvm::Module>("My cool jit", TheContext);
+    TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
     TheFPM = llvm::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
 
