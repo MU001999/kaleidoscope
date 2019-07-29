@@ -2,6 +2,7 @@
 #define KALEIDOSCOPE_PARSER_HPP
 
 #include <memory>
+#include <unordered_set>
 
 #include "node.hpp"
 #include "lexer.hpp"

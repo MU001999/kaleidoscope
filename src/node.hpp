@@ -19,12 +19,17 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Scalar/GVN.h"
 
 namespace kaleidoscope
 {
 inline llvm::LLVMContext TheContext;
 inline llvm::IRBuilder<> Builder(TheContext);
 inline std::unique_ptr<llvm::Module> TheModule;
+inline std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 inline std::map<std::string, llvm::Value *> NamedValues;
 
 inline std::unique_ptr<class ExprAST> log_error(const char *str)
@@ -49,6 +54,20 @@ inline llvm::Function *log_error_f(const char *str)
 {
     log_error(str);
     return nullptr;
+}
+
+inline void initialize_module_and_pass_manager()
+{
+    TheModule = llvm::make_unique<llvm::Module>("My cool jit", TheContext);
+
+    TheFPM = llvm::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+
+    TheFPM->add(llvm::createInstructionCombiningPass());
+    TheFPM->add(llvm::createReassociatePass());
+    TheFPM->add(llvm::createGVNPass());
+    TheFPM->add(llvm::createCFGSimplificationPass());
+
+    TheFPM->doInitialization();
 }
 
 // ExprAST - Base class for all expression nodes

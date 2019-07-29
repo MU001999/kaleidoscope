@@ -111,7 +111,7 @@ Function *FunctionAST::codegen()
     {
         Builder.CreateRet(ret_val);
         verifyFunction(*the_function);
-
+        TheFPM->run(*the_function);
         return the_function;
     }
 
