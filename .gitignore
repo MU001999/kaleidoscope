@@ -33,3 +33,5 @@
 
 # folders
 .vscode/
+obj/
+bin/
