@@ -29,12 +29,15 @@
 
 namespace kaleidoscope
 {
+class PrototypeAST;
+
 inline llvm::LLVMContext TheContext;
 inline llvm::IRBuilder<> Builder(TheContext);
 inline std::unique_ptr<llvm::Module> TheModule;
 inline std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 inline std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
 inline std::map<std::string, llvm::Value *> NamedValues;
+inline std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
 
 inline std::unique_ptr<class ExprAST> log_error(const char *str)
 {

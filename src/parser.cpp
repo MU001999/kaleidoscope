@@ -185,6 +185,9 @@ void Parser::handle_definition()
             fprintf(stderr, "Parsed a function definition\n");
             fn_ir->print(llvm::errs());
             fprintf(stderr, "\n");
+
+            TheJIT->addModule(move(TheModule));
+            initialize_module_and_pass_manager();
         }
     }
     else
@@ -202,6 +205,8 @@ void Parser::handle_extern()
             fprintf(stderr, "Parsed an extern\n");
             proto_ir->print(llvm::errs());
             fprintf(stderr, "\n");
+
+            FunctionProtos[proto_ast->get_name()] = move(proto_ast);
         }
     }
     else

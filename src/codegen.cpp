@@ -1,3 +1,6 @@
+#include <memory>
+#include <string>
+
 #include "node.hpp"
 
 using namespace std;
@@ -5,6 +8,21 @@ using namespace llvm;
 
 namespace kaleidoscope
 {
+Function *get_function(const string &name)
+{
+    if (auto f = TheModule->getFunction(name))
+    {
+        return f;
+    }
+
+    if (FunctionProtos.count(name))
+    {
+        return FunctionProtos[name]->codegen();
+    }
+
+    return nullptr;
+}
+
 Value *NumberExprAST::codegen()
 {
     return ConstantFP::get(TheContext, APFloat(value_));
@@ -46,7 +64,7 @@ Value *BinaryExprAST::codegen()
 
 Value *CallExprAST::codegen()
 {
-    auto callee = TheModule->getFunction(callee_);
+    auto callee = get_function(callee_);
     if (!callee)
     {
         return log_error_v("Unknown function referenced");
@@ -84,11 +102,10 @@ Function *PrototypeAST::codegen()
 
 Function *FunctionAST::codegen()
 {
-    auto the_function = TheModule->getFunction(proto_->get_name());
-    if (!the_function)
-    {
-        the_function = proto_->codegen();
-    }
+    auto &proto = *proto_;
+    FunctionProtos[proto.get_name()] = move(proto_);
+    auto the_function = get_function(proto.get_name());
+
     if (!the_function)
     {
         return nullptr;
