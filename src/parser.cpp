@@ -226,7 +226,7 @@ void Parser::handle_top_level_expression()
             auto expr_symbol = TheJIT->findSymbol("__anno_expr");
             assert(expr_symbol && "Function not found");
 
-            auto fp = (double (*)())(intptr_t)expr_symbol.getAddress().get();
+            auto fp = (double (*)())expr_symbol.getAddress().get();
             fprintf(stderr, "Evaluated to %f\n", fp());
 
             TheJIT->removeModule(h);
