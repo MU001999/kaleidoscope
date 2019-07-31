@@ -54,6 +54,8 @@ unique_ptr<ExprAST> Parser::parse_primary()
         return parse_number_expr();
     case '(':
         return parse_paren_expr();
+    case Token::IF:
+        return parse_if_expr();
     default:
         return log_error("unknown token when expecting an expression");
     }
@@ -118,6 +120,41 @@ unique_ptr<ExprAST> Parser::parse_identifier_expr()
     }
     get_next_token();
     return std::make_unique<CallExprAST>(name, move(args));
+}
+
+unique_ptr<ExprAST> Parser::parse_if_expr()
+{
+    get_next_token();
+
+    auto cond = parse_expression();
+    if (!cond)
+    {
+        return nullptr;
+    }
+    if (cur_token_.type() != Token::THEN)
+    {
+        return log_error("expected then");
+    }
+    get_next_token();
+
+    auto then = parse_expression();
+    if (!then)
+    {
+        return nullptr;
+    }
+    if (cur_token_.type() != Token::ELSE)
+    {
+        return log_error("expected else");
+    }
+    get_next_token();
+
+    auto els = parse_expression();
+    if (!els)
+    {
+        return nullptr;
+    }
+
+    return std::make_unique<IfExprAST>(move(cond), move(then), move(els));
 }
 
 unique_ptr<PrototypeAST> Parser::parse_extern()

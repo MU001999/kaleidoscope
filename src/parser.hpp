@@ -55,6 +55,7 @@ class Parser
     std::unique_ptr<ExprAST> parse_number_expr();
     std::unique_ptr<ExprAST> parse_paren_expr();
     std::unique_ptr<ExprAST> parse_identifier_expr();
+    std::unique_ptr<ExprAST> parse_if_expr();
 
     std::unique_ptr<PrototypeAST> parse_extern();
     std::unique_ptr<PrototypeAST> parse_prototype();
