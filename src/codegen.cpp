@@ -86,6 +86,53 @@ Value *CallExprAST::codegen()
     return Builder.CreateCall(callee, args, "calltmp");
 }
 
+Value *IfExprAST::codegen()
+{
+    auto cond = cond_->codegen();
+    if (!cond)
+    {
+        return nullptr;
+    }
+
+    cond = Builder.CreateFCmpONE(cond, ConstantFP::get(TheContext, APFloat(0.0)), "ifcond");
+
+    Function *the_function = Builder.GetInsertBlock()->getParent();
+
+    auto then_bb = BasicBlock::Create(TheContext, "then", the_function);
+    auto else_bb = BasicBlock::Create(TheContext, "else");
+    auto merge_bb = BasicBlock::Create(TheContext, "ifcont");
+
+    Builder.CreateCondBr(cond, then_bb, else_bb);
+
+    Builder.SetInsertPoint(then_bb);
+    auto then = then_->codegen();
+    if (!then)
+    {
+        return nullptr;
+    }
+    Builder.CreateBr(merge_bb);
+    then_bb = Builder.GetInsertBlock();
+
+    the_function->getBasicBlockList().push_back(else_bb);
+    Builder.SetInsertPoint(else_bb);
+
+    auto els = else_->codegen();
+    if (!els)
+    {
+        return nullptr;
+    }
+    Builder.CreateBr(merge_bb);
+    else_bb = Builder.GetInsertBlock();
+
+    the_function->getBasicBlockList().push_back(merge_bb);
+    Builder.SetInsertPoint(merge_bb);
+    auto pn = Builder.CreatePHI(Type::getDoubleTy(TheContext), 2, "iftmp");
+
+    pn->addIncoming(then, then_bb);
+    pn->addIncoming(els, else_bb);
+    return pn;
+}
+
 Function *PrototypeAST::codegen()
 {
     std::vector<Type *> doubles(args_.size(), Type::getDoubleTy(TheContext));
