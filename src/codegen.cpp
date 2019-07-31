@@ -110,10 +110,6 @@ Function *FunctionAST::codegen()
     {
         return nullptr;
     }
-    if (!the_function->empty())
-    {
-        return log_error_f("Function cannot be redefined");
-    }
 
     auto bb = BasicBlock::Create(TheContext, "entry", the_function);
     Builder.SetInsertPoint(bb);
