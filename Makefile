@@ -13,7 +13,7 @@ CC = g++
 CPPFLAGS = -g -std=c++17
 
 ${BIN_TARGET}: ${OBJ} | ${DIR_BIN}
-	${CC} ${OBJ} `llvm-config --cxxflags --ldflags --system-libs --libs core mcjit native` -O3 -rdynamic -o $@
+	${CC} -g ${OBJ} `llvm-config --cxxflags --ldflags --system-libs --libs core mcjit native` -O3 -rdynamic -o $@
 
 ${DIR_OBJ}/%.o: ${DIR_SRC}/%.cpp | ${DIR_OBJ}
 	${CC} ${CPPFLAGS} -c $< -o $@
