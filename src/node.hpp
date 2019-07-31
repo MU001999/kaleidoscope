@@ -70,10 +70,10 @@ inline void initialize_module_and_pass_manager()
 
     TheFPM = llvm::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
 
-    TheFPM->add(llvm::createInstructionCombiningPass());
-    TheFPM->add(llvm::createReassociatePass());
-    TheFPM->add(llvm::createGVNPass());
-    TheFPM->add(llvm::createCFGSimplificationPass());
+    // TheFPM->add(llvm::createInstructionCombiningPass());
+    // TheFPM->add(llvm::createReassociatePass());
+    // TheFPM->add(llvm::createGVNPass());
+    // TheFPM->add(llvm::createCFGSimplificationPass());
 
     TheFPM->doInitialization();
 }
@@ -130,6 +130,19 @@ class CallExprAST : public ExprAST
     CallExprAST(const std::string &callee,
         std::vector<std::unique_ptr<ExprAST>> args)
       : callee_(callee), args_(std::move(args)) {}
+    llvm::Value *codegen() override;
+};
+
+class IfExprAST : public ExprAST
+{
+    std::unique_ptr<ExprAST> cond_, then_, else_;
+
+  public:
+    IfExprAST(std::unique_ptr<ExprAST> cond,
+        std::unique_ptr<ExprAST> then,
+        std::unique_ptr<ExprAST> els)
+      : cond_(std::move(cond)), then_(std::move(then)), else_(std::move(els)) {}
+
     llvm::Value *codegen() override;
 };
 
