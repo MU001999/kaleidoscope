@@ -10,15 +10,20 @@ class Token
   public:
     enum Type
     {
+        END         = -1,
+
         // commands
-        DEF = -1,
-        EXTERN = -2,
+        DEF         = -2,
+        EXTERN      = -3,
 
         // primary
-        IDENTIFIER = -3,
-        NUMBER = -4,
+        IDENTIFIER  = -4,
+        NUMBER      = -5,
 
-        END = -5
+        // control
+        IF          = -6,
+        THEN        = -7,
+        ELSE        = -8
     };
 
     Token() = default;

@@ -11,8 +11,11 @@ namespace
 using kaleidoscope::Token;
 const unordered_map<string, Token::Type> symbols
 {
-    { "def", Token::DEF },
-    { "extern", Token::EXTERN }
+    { "def",    Token::DEF },
+    { "extern", Token::EXTERN },
+    { "if",     Token::IF },
+    { "then",   Token::THEN },
+    { "else",   Token::ELSE }
 };
 } // namespace
 
