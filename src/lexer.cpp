@@ -15,7 +15,9 @@ const unordered_map<string, Token::Type> symbols
     { "extern", Token::EXTERN },
     { "if",     Token::IF },
     { "then",   Token::THEN },
-    { "else",   Token::ELSE }
+    { "else",   Token::ELSE },
+    { "for",    Token::FOR },
+    { "in",     Token::IN }
 };
 } // namespace
 

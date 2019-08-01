@@ -23,7 +23,9 @@ class Token
         // control
         IF          = -6,
         THEN        = -7,
-        ELSE        = -8
+        ELSE        = -8,
+        FOR         = -9,
+        IN          = -10
     };
 
     Token() = default;
