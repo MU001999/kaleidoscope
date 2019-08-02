@@ -146,6 +146,23 @@ class IfExprAST : public ExprAST
     llvm::Value *codegen() override;
 };
 
+class ForExprAST : public ExprAST
+{
+    std::string var_name_;
+    std::unique_ptr<ExprAST> start_, end_, step_, body_;
+
+  public:
+    ForExprAST(const std::string &var_name,
+        std::unique_ptr<ExprAST> start,
+        std::unique_ptr<ExprAST> end,
+        std::unique_ptr<ExprAST> step,
+        std::unique_ptr<ExprAST> body)
+      : var_name_(var_name), start_(move(start)), end_(move(end)),
+        step_(move(step)), body_(move(body)) {}
+
+    llvm::Value *codegen() override;
+};
+
 // PrototypeAST - This class represents the "prototype" for a function,
 // which captures its name, and its argument names (thus implicitly the number
 // of arguments the function takes).
