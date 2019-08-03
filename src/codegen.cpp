@@ -133,6 +133,75 @@ Value *IfExprAST::codegen()
     return pn;
 }
 
+Value *ForExprAST::codegen()
+{
+    auto start = start_->codegen();
+    if (!start)
+    {
+        return nullptr;
+    }
+
+    auto the_function = Builder.GetInsertBlock()->getParent();
+    auto preheader_bb = Builder.GetInsertBlock();
+    auto loop_bb = BasicBlock::Create(TheContext, "loop", the_function);
+
+    Builder.CreateBr(loop_bb);
+    Builder.SetInsertPoint(loop_bb);
+
+    auto var = Builder.CreatePHI(Type::getDoubleTy(TheContext), 2, var_name_.c_str());
+    var->addIncoming(start, preheader_bb);
+
+    auto old_val = NamedValues[var_name_];
+    NamedValues[var_name_] = var;
+
+    if (!body_->codegen())
+    {
+        return nullptr;
+    }
+
+    Value *step = nullptr;
+    if (step_)
+    {
+        step = step_->codegen();
+        if (!step)
+        {
+            return nullptr;
+        }
+    }
+    else
+    {
+        step = ConstantFP::get(TheContext, APFloat(1.0));
+    }
+
+    auto next_var = Builder.CreateFAdd(var, step, "nextvar");
+    auto end_cond = end_->codegen();
+    if (!end_cond)
+    {
+        return nullptr;
+    }
+
+    end_cond = Builder.CreateFCmpONE(end_cond, ConstantFP::get(TheContext, APFloat(0.0)), "loopcond");
+
+    auto loop_end_bb = Builder.GetInsertBlock();
+    auto after_bb = BasicBlock::Create(TheContext, "afterloop", the_function);
+
+    Builder.CreateCondBr(end_cond, loop_bb, after_bb);
+    Builder.SetInsertPoint(after_bb);
+
+    var->addIncoming(next_var, loop_end_bb);
+
+    if (old_val)
+    {
+        NamedValues[var_name_] = old_val;
+    }
+    else
+    {
+        NamedValues.erase(var_name_);
+    }
+
+    return Constant::getNullValue(Type::getDoubleTy(TheContext));
+}
+
 Function *PrototypeAST::codegen()
 {
     std::vector<Type *> doubles(args_.size(), Type::getDoubleTy(TheContext));
