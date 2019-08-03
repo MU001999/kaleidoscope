@@ -157,6 +157,67 @@ unique_ptr<ExprAST> Parser::parse_if_expr()
     return std::make_unique<IfExprAST>(move(cond), move(then), move(els));
 }
 
+unique_ptr<ExprAST> Parser::parse_for_expr()
+{
+    get_next_token();
+
+    if (cur_token_.type() != Token::IDENTIFIER)
+    {
+        return log_error("expected identifier after for");
+    }
+
+    auto var_name = cur_token_.value();
+    get_next_token();
+
+    if (cur_token_.type() != '=')
+    {
+        return log_error("expected '=' after for");
+    }
+    get_next_token();
+
+    auto start = parse_expression();
+    if (!start)
+    {
+        return nullptr;
+    }
+    if (cur_token_.type() != ',')
+    {
+        return log_error("expected ',' after for start value");
+    }
+    get_next_token();
+
+    auto end = parse_expression();
+    if (!end)
+    {
+        return nullptr;
+    }
+
+    unique_ptr<ExprAST> step;
+    if (cur_token_.type() == ',')
+    {
+        get_next_token();
+        step = parse_expression();
+        if (!step)
+        {
+            return nullptr;
+        }
+    }
+
+    if (cur_token_.type() != Token::IN)
+    {
+        return log_error("expected 'in' after for");
+    }
+    get_next_token();
+
+    auto body = parse_expression();
+    if (!body)
+    {
+        return nullptr;
+    }
+
+    return std::make_unique<ForExprAST>(var_name, move(start), move(end), move(step), move(body));
+}
+
 unique_ptr<PrototypeAST> Parser::parse_extern()
 {
     get_next_token();
