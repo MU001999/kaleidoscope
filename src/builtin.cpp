@@ -1,11 +1,7 @@
-extern "C" double fib(double n)
+#include <cstdio>
+
+extern "C" double putchard(double c)
 {
-    if (n < 3.0)
-    {
-        return 1.0;
-    }
-    else
-    {
-        return fib(n - 1) + fib(n - 2);
-    }
+    fputc((char)c, stderr);
+    return 0.0;
 }
