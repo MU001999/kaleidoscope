@@ -56,6 +56,8 @@ unique_ptr<ExprAST> Parser::parse_primary()
         return parse_paren_expr();
     case Token::IF:
         return parse_if_expr();
+    case Token::FOR:
+        return parse_for_expr();
     default:
         return log_error("unknown token when expecting an expression");
     }
