@@ -10,6 +10,16 @@
 
 using namespace std;
 
+namespace
+{
+std::vector<std::unordered_set<int>> precedences
+{
+    { '<' },
+    { '+', '-' },
+    { '*' }
+};
+} // namespace
+
 namespace kaleidoscope
 {
 void Parser::main_loop()
@@ -42,6 +52,27 @@ void Parser::main_loop()
 Token Parser::get_next_token()
 {
     return cur_token_ = lexer_.next();
+}
+
+unique_ptr<ExprAST> Parser::parse_expression(size_t precedence)
+{
+    if (precedence == precedences.size())
+    {
+        return parse_primary();
+    }
+    else
+    {
+        auto lhs = parse_expression(precedence + 1);
+        auto op = cur_token_.type();
+        while (precedences[precedence].count(op))
+        {
+            get_next_token();
+            auto rhs = parse_expression(precedence + 1);
+            lhs = std::make_unique<BinaryExprAST>(op, move(lhs), move(rhs));
+            op = cur_token_.type();
+        }
+        return lhs;
+    }
 }
 
 unique_ptr<ExprAST> Parser::parse_primary()
