@@ -253,9 +253,19 @@ Function *FunctionAST::codegen()
 
     if (proto.is_binary_op())
     {
+        auto op = proto.get_operator_name();
         auto precedence = proto.get_binary_precedence();
-        auto pos = lower_bound(Parser::precedences_.begin(), Parser::precedences_.end(), precedence);
-        if (pos != Parser::precedences_.end() && *pos != precedence)
+        if (Parser::symbol_precedences_.count(op)
+            && Parser::symbol_precedences_[op] != precedence)
+        {
+            Parser::precedence_symbols_[Parser::symbol_precedences_[op]].erase(op);
+        }
+        Parser::symbol_precedences_[op] = precedence;
+        auto pos = lower_bound(Parser::precedences_.begin(),
+            Parser::precedences_.end(),
+            precedence);
+        if (pos == Parser::precedences_.end()
+            || *pos != precedence)
         {
             Parser::precedences_.insert(pos, precedence);
         }

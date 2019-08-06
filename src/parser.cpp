@@ -23,6 +23,14 @@ unordered_map<size_t, set<char>> Parser::precedence_symbols_
     { 40, { '*' } }
 };
 
+unordered_map<char, size_t> Parser::symbol_precedences_
+{
+    { '<', 10 },
+    { '+', 20 },
+    { '-', 20 },
+    { '*', 40 }
+};
+
 void Parser::main_loop()
 {
     fprintf(stderr, "ready> ");
@@ -105,7 +113,7 @@ unique_ptr<ExprAST> Parser::parse_unary()
 {
     auto op = cur_token_.type();
     get_next_token();
-    if (auto operand = parse_unary())
+    if (auto operand = parse_primary())
     {
         return std::make_unique<UnaryExprAST>(op, move(operand));
     }

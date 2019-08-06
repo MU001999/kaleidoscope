@@ -44,6 +44,7 @@ class Parser
 
     static std::list<size_t> precedences_;
     static std::unordered_map<size_t, std::set<char>> precedence_symbols_;
+    static std::unordered_map<char, size_t> symbol_precedences_;
 
     friend class FunctionAST;
 };
