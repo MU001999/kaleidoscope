@@ -107,6 +107,18 @@ class VariableExprAST : public ExprAST
     llvm::Value *codegen() override;
 };
 
+class UnaryExprAST : public ExprAST
+{
+    char op_;
+    std::unique_ptr<ExprAST> operand_;
+
+  public:
+    UnaryExprAST(char op, std::unique_ptr<ExprAST> operand)
+      : op_(op), operand_(std::move(operand)) {}
+
+    llvm::Value *codegen() override;
+};
+
 // BinaryExprAST - Expression class for a binary operator.
 class BinaryExprAST : public ExprAST
 {
