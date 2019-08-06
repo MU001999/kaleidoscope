@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cassert>
 #include <utility>
 
 #include "KaleidoscopeJIT.h"
@@ -170,13 +171,25 @@ class PrototypeAST
 {
     std::string name_;
     std::vector<std::string> args_;
+    bool is_operator_;
+    size_t precedence_;
 
   public:
     PrototypeAST(const std::string &name,
-        std::vector<std::string> args)
-      : name_(name), args_(std::move(args)) {}
+        std::vector<std::string> args,
+        bool is_operator, size_t precedence)
+      : name_(name), args_(std::move(args)),
+        is_operator_(is_operator), precedence_(precedence) {}
 
     const std::string &get_name() const { return name_; }
+    bool is_unary_op() const { return is_operator_ && args_.size() == 1; }
+    bool is_binary_op() const { return is_operator_ && args_.size() == 2; }
+    char get_operator_name() const
+    {
+        assert(is_unary_op() || is_binary_op());
+        return name_.back();
+    }
+    size_t get_binary_precedence() const { return precedence_; }
     llvm::Function *codegen();
 };
 
