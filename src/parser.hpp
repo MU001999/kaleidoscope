@@ -21,7 +21,7 @@ class Parser
     Token get_next_token();
 
   private:
-    std::unique_ptr<ExprAST> parse_expression(std::list<int>::iterator precedence = precedences_.begin());
+    std::unique_ptr<ExprAST> parse_expression(std::list<size_t>::iterator precedence = precedences_.begin());
     std::unique_ptr<ExprAST> parse_primary();
     std::unique_ptr<ExprAST> parse_number_expr();
     std::unique_ptr<ExprAST> parse_paren_expr();
@@ -41,8 +41,8 @@ class Parser
     Lexer lexer_;
     Token cur_token_;
 
-    static std::list<int> precedences_;
-    static std::unordered_map<int, std::set<char>> precedence_symbols_;
+    static std::list<size_t> precedences_;
+    static std::unordered_map<size_t, std::set<char>> precedence_symbols_;
 };
 } // namespace kaleidoscope
 

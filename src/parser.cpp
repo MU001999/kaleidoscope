@@ -11,12 +11,12 @@ using namespace std;
 
 namespace kaleidoscope
 {
-list<int> Parser::precedences_
+list<size_t> Parser::precedences_
 {
     10, 20, 40
 };
 
-unordered_map<int, set<char>> Parser::precedence_symbols_
+unordered_map<size_t, set<char>> Parser::precedence_symbols_
 {
     { 10, { '<' } },
     { 20, { '+', '-' } },
@@ -55,7 +55,7 @@ Token Parser::get_next_token()
     return cur_token_ = lexer_.next();
 }
 
-unique_ptr<ExprAST> Parser::parse_expression(list<int>::iterator precedence)
+unique_ptr<ExprAST> Parser::parse_expression(list<size_t>::iterator precedence)
 {
     if (precedence == precedences_.end())
     {
