@@ -43,6 +43,8 @@ class Parser
 
     static std::list<size_t> precedences_;
     static std::unordered_map<size_t, std::set<char>> precedence_symbols_;
+
+    friend class FunctionAST;
 };
 } // namespace kaleidoscope
 

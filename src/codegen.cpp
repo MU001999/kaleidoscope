@@ -1,7 +1,9 @@
 #include <memory>
 #include <string>
+#include <algorithm>
 
 #include "node.hpp"
+#include "parser.hpp"
 
 using namespace std;
 using namespace llvm;
@@ -58,8 +60,13 @@ Value *BinaryExprAST::codegen()
         lhs = Builder.CreateFCmpULT(lhs, rhs, "cmptmp");
         return Builder.CreateUIToFP(lhs, Type::getDoubleTy(TheContext), "booltmp");
     default:
-        return log_error_v("invalid binary operator");
+        break;
     }
+
+    auto f = get_function("binary"s + op_);
+    assert(f && "binary operator not found!");
+
+    return Builder.CreateCall(f, { lhs, rhs }, "binop");
 }
 
 Value *CallExprAST::codegen()
@@ -225,6 +232,17 @@ Function *FunctionAST::codegen()
     if (!the_function)
     {
         return nullptr;
+    }
+
+    if (proto.is_binary_op())
+    {
+        auto precedence = proto.get_binary_precedence();
+        auto pos = lower_bound(Parser::precedences_.begin(), Parser::precedences_.end(), precedence);
+        if (pos != Parser::precedences_.end() && *pos != precedence)
+        {
+            Parser::precedences_.insert(pos, precedence);
+        }
+        Parser::precedence_symbols_[precedence].insert(proto.get_operator_name());
     }
 
     auto bb = BasicBlock::Create(TheContext, "entry", the_function);
