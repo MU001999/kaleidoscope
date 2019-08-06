@@ -3,25 +3,26 @@
 #include <vector>
 #include <cassert>
 #include <utility>
-#include <unordered_set>
 
 #include "node.hpp"
 #include "parser.hpp"
 
 using namespace std;
 
-namespace
-{
-std::vector<std::unordered_set<int>> precedences
-{
-    { '<' },
-    { '+', '-' },
-    { '*' }
-};
-} // namespace
-
 namespace kaleidoscope
 {
+list<int> Parser::precedences_
+{
+    10, 20, 40
+};
+
+unordered_map<int, set<char>> Parser::precedence_symbols_
+{
+    { 10, { '<' } },
+    { 20, { '+', '-' } },
+    { 40, { '*' } }
+};
+
 void Parser::main_loop()
 {
     fprintf(stderr, "ready> ");
@@ -54,20 +55,20 @@ Token Parser::get_next_token()
     return cur_token_ = lexer_.next();
 }
 
-unique_ptr<ExprAST> Parser::parse_expression(size_t precedence)
+unique_ptr<ExprAST> Parser::parse_expression(list<int>::iterator precedence)
 {
-    if (precedence == precedences.size())
+    if (precedence == precedences_.end())
     {
         return parse_primary();
     }
     else
     {
-        auto lhs = parse_expression(precedence + 1);
+        auto lhs = parse_expression(next(precedence));
         auto op = cur_token_.type();
-        while (precedences[precedence].count(op))
+        while (precedence_symbols_[*precedence].count(op))
         {
             get_next_token();
-            auto rhs = parse_expression(precedence + 1);
+            auto rhs = parse_expression(next(precedence));
             lhs = std::make_unique<BinaryExprAST>(op, move(lhs), move(rhs));
             op = cur_token_.type();
         }
