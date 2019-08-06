@@ -103,7 +103,7 @@ unique_ptr<ExprAST> Parser::parse_unary()
 {
     auto op = cur_token_.type();
     get_next_token();
-    if (auto operand = parse_primary())
+    if (auto operand = parse_unary())
     {
         return std::make_unique<UnaryExprAST>(op, move(operand));
     }
