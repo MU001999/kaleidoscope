@@ -362,7 +362,7 @@ unique_ptr<FunctionAST> Parser::parse_top_level_expr()
 {
     if (auto expr = parse_expression())
     {
-        auto proto = std::make_unique<PrototypeAST>("__anno_expr", vector<string>());
+        auto proto = std::make_unique<PrototypeAST>("__anno_expr", vector<string>(), false);
         return std::make_unique<FunctionAST>(move(proto), move(expr));
     }
     return nullptr;

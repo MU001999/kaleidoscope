@@ -189,7 +189,7 @@ class PrototypeAST
   public:
     PrototypeAST(const std::string &name,
         std::vector<std::string> args,
-        bool is_operator, size_t precedence)
+        bool is_operator, size_t precedence = 30)
       : name_(name), args_(std::move(args)),
         is_operator_(is_operator), precedence_(precedence) {}
 
