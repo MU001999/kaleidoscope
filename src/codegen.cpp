@@ -42,7 +42,19 @@ Value *VariableExprAST::codegen()
 
 Value *UnaryExprAST::codegen()
 {
-    // ...
+    auto val = operand_->codegen();
+    if (!val)
+    {
+        return nullptr;
+    }
+
+    auto f = get_function("unary"s + op_);
+    if (!f)
+    {
+        return log_error_v("Unknown unary operator");
+    }
+
+    return Builder.CreateCall(f, val, "unop");
 }
 
 Value *BinaryExprAST::codegen()
