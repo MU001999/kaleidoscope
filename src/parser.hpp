@@ -23,6 +23,7 @@ class Parser
   private:
     std::unique_ptr<ExprAST> parse_expression(std::list<size_t>::iterator precedence = precedences_.begin());
     std::unique_ptr<ExprAST> parse_primary();
+    std::unique_ptr<ExprAST> parse_unary();
     std::unique_ptr<ExprAST> parse_number_expr();
     std::unique_ptr<ExprAST> parse_paren_expr();
     std::unique_ptr<ExprAST> parse_identifier_expr();

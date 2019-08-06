@@ -91,8 +91,23 @@ unique_ptr<ExprAST> Parser::parse_primary()
     case Token::FOR:
         return parse_for_expr();
     default:
-        return log_error("unknown token when expecting an expression");
+        if (!isascii(cur_token_.type()))
+        {
+            return log_error("unknown token when expecting an expression");
+        }
+        return parse_unary();
     }
+}
+
+unique_ptr<ExprAST> Parser::parse_unary()
+{
+    auto op = cur_token_.type();
+    get_next_token();
+    if (auto operand = parse_primary())
+    {
+        return std::make_unique<UnaryExprAST>(op, move(operand));
+    }
+    return nullptr;
 }
 
 unique_ptr<ExprAST> Parser::parse_number_expr()

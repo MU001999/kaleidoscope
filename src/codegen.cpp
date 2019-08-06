@@ -40,6 +40,11 @@ Value *VariableExprAST::codegen()
     return V;
 }
 
+Value *UnaryExprAST::codegen()
+{
+    // ...
+}
+
 Value *BinaryExprAST::codegen()
 {
     auto lhs = lhs_->codegen();
