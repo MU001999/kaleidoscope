@@ -29,7 +29,6 @@ void Parser::main_loop()
     get_next_token();
     while (true)
     {
-        fprintf(stderr, "ready> ");
         switch (cur_token_.type())
         {
         case Token::END:
@@ -39,12 +38,15 @@ void Parser::main_loop()
             break;
         case Token::DEF:
             handle_definition();
+            fprintf(stderr, "ready> ");
             break;
         case Token::EXTERN:
             handle_extern();
+            fprintf(stderr, "ready> ");
             break;
         default:
             handle_top_level_expression();
+            fprintf(stderr, "ready> ");
             break;
         }
     }
