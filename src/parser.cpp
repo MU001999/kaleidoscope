@@ -287,6 +287,16 @@ unique_ptr<PrototypeAST> Parser::parse_prototype()
         fn_name = cur_token_.value();
         break;
 
+    case Token::UNARY:
+        get_next_token();
+        if (!isascii(cur_token_.type()))
+        {
+            return log_error_p("Expected unary operator");
+        }
+        fn_name = "unary"s + (char)cur_token_.type();
+        kind = 1;
+        break;
+
     case Token::BINARY:
         get_next_token();
         if (!isascii(cur_token_.type()))
