@@ -260,11 +260,40 @@ unique_ptr<PrototypeAST> Parser::parse_extern()
 
 unique_ptr<PrototypeAST> Parser::parse_prototype()
 {
-    if (cur_token_.type() != Token::IDENTIFIER)
+    string fn_name;
+    short kind = 0, binary_precedence = 30;
+
+    switch (cur_token_.type())
     {
+    default:
         return log_error_p("Expected function name in prototype");
+
+    case Token::IDENTIFIER:
+        fn_name = cur_token_.value();
+        break;
+
+    case Token::BINARY:
+        get_next_token();
+        if (!isascii(cur_token_.type()))
+        {
+            return log_error_p("Expected binary operator");
+        }
+        fn_name = "binary"s + (char)cur_token_.type();
+        kind = 2;
+        get_next_token();
+
+        if (cur_token_.type() == Token::NUMBER)
+        {
+            auto num_val = stoi(cur_token_.value());
+            if (num_val < 1 || num_val > 100)
+            {
+                return log_error_p("Invalid precedence: must be 1..100");
+            }
+            binary_precedence = num_val;
+        }
+        break;
     }
-    auto name = cur_token_.value();
+
     get_next_token();
     if (cur_token_.type() != '(')
     {
@@ -280,7 +309,13 @@ unique_ptr<PrototypeAST> Parser::parse_prototype()
         return log_error_p("Expected ')' in prototype");
     }
     get_next_token();
-    return std::make_unique<PrototypeAST>(name, move(args));
+
+    if (kind && args.size() != kind)
+    {
+        return log_error_p("Invalid number of operands for operator");
+    }
+
+    return std::make_unique<PrototypeAST>(fn_name, move(args), !kind, binary_precedence);
 }
 
 unique_ptr<FunctionAST> Parser::parse_definition()
