@@ -25,7 +25,11 @@ class Token
         THEN        = -7,
         ELSE        = -8,
         FOR         = -9,
-        IN          = -10
+        IN          = -10,
+
+        // operators
+        BINARY      = -11,
+        UNARY       = -12
     };
 
     Token() = default;
