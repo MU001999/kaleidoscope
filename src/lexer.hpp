@@ -29,7 +29,10 @@ class Token
 
         // operators
         BINARY      = -11,
-        UNARY       = -12
+        UNARY       = -12,
+
+        // var definition
+        VAR         = -13,
     };
 
     Token() = default;

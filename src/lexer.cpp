@@ -19,7 +19,8 @@ const unordered_map<string, Token::Type> symbols
     { "for",    Token::FOR },
     { "in",     Token::IN },
     { "binary", Token::BINARY },
-    { "unary",  Token::UNARY }
+    { "unary",  Token::UNARY },
+    { "var",    Token::VAR }
 };
 } // namespace
 
