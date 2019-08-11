@@ -277,6 +277,12 @@ unique_ptr<ExprAST> Parser::parse_for_expr()
     return std::make_unique<ForExprAST>(var_name, move(start), move(end), move(step), move(body));
 }
 
+unique_ptr<ExprAST> Parser::parse_var_expr()
+{
+    get_next_token();
+    // ...
+}
+
 unique_ptr<PrototypeAST> Parser::parse_extern()
 {
     get_next_token();
