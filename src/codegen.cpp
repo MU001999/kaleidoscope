@@ -226,6 +226,11 @@ Value *ForExprAST::codegen()
     return Constant::getNullValue(Type::getDoubleTy(TheContext));
 }
 
+Value *VarExprAST::codegen()
+{
+    // ...
+}
+
 Function *PrototypeAST::codegen()
 {
     std::vector<Type *> doubles(args_.size(), Type::getDoubleTy(TheContext));
