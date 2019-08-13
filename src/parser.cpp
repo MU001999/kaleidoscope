@@ -100,6 +100,8 @@ unique_ptr<ExprAST> Parser::parse_primary()
         return parse_if_expr();
     case Token::FOR:
         return parse_for_expr();
+    case Token::VAR:
+        return parse_var_expr();
     default:
         if (!isascii(cur_token_.type()))
         {
