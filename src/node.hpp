@@ -37,7 +37,7 @@ inline llvm::IRBuilder<> Builder(TheContext);
 inline std::unique_ptr<llvm::Module> TheModule;
 inline std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 inline std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
-inline std::map<std::string, llvm::Value *> NamedValues;
+inline std::map<std::string, llvm::AllocaInst*> NamedValues;
 inline std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
 
 inline std::unique_ptr<class ExprAST> log_error(const char *str)
@@ -77,6 +77,14 @@ inline void initialize_module_and_pass_manager()
     TheFPM->add(llvm::createCFGSimplificationPass());
 
     TheFPM->doInitialization();
+}
+
+inline llvm::AllocaInst *create_entry_block_alloca(llvm::Function *the_function,
+    const std::string &var_name)
+{
+    llvm::IRBuilder<> tmp_b(&the_function->getEntryBlock(),
+        the_function->getEntryBlock().begin());
+    return tmp_b.CreateAlloca(llvm::Type::getDoubleTy(TheContext), 0, var_name.c_str());
 }
 
 // ExprAST - Base class for all expression nodes
