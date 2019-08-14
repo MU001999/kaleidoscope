@@ -37,7 +37,7 @@ Value *VariableExprAST::codegen()
     {
         log_error_v("Unknown variable name");
     }
-    return V;
+    return Builder.CreateLoad(V, name_.c_str());
 }
 
 Value *UnaryExprAST::codegen()
@@ -166,17 +166,13 @@ Value *ForExprAST::codegen()
     }
 
     auto the_function = Builder.GetInsertBlock()->getParent();
-    auto preheader_bb = Builder.GetInsertBlock();
+    auto alloca = create_entry_block_alloca(the_function, var_name_);
+    Builder.CreateStore(start, alloca);
+
     auto loop_bb = BasicBlock::Create(TheContext, "loop", the_function);
 
     Builder.CreateBr(loop_bb);
     Builder.SetInsertPoint(loop_bb);
-
-    auto var = Builder.CreatePHI(Type::getDoubleTy(TheContext), 2, var_name_.c_str());
-    var->addIncoming(start, preheader_bb);
-
-    auto old_val = NamedValues[var_name_];
-    NamedValues[var_name_] = var;
 
     if (!body_->codegen())
     {
@@ -197,31 +193,21 @@ Value *ForExprAST::codegen()
         step = ConstantFP::get(TheContext, APFloat(1.0));
     }
 
-    auto next_var = Builder.CreateFAdd(var, step, "nextvar");
     auto end_cond = end_->codegen();
     if (!end_cond)
     {
         return nullptr;
     }
 
+    auto cur_var = Builder.CreateLoad(alloca);
+    auto next_var = Builder.CreateFAdd(cur_var, step, "nextvar");
+    Builder.CreateStore(next_var, alloca);
     end_cond = Builder.CreateFCmpONE(end_cond, ConstantFP::get(TheContext, APFloat(0.0)), "loopcond");
 
-    auto loop_end_bb = Builder.GetInsertBlock();
     auto after_bb = BasicBlock::Create(TheContext, "afterloop", the_function);
 
     Builder.CreateCondBr(end_cond, loop_bb, after_bb);
     Builder.SetInsertPoint(after_bb);
-
-    var->addIncoming(next_var, loop_end_bb);
-
-    if (old_val)
-    {
-        NamedValues[var_name_] = old_val;
-    }
-    else
-    {
-        NamedValues.erase(var_name_);
-    }
 
     return Constant::getNullValue(Type::getDoubleTy(TheContext));
 }
