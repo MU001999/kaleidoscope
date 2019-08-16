@@ -269,7 +269,9 @@ Function *FunctionAST::codegen()
     NamedValues.clear();
     for (auto &arg : the_function->args())
     {
-        NamedValues[arg.getName()] = &arg;
+        auto alloca = create_entry_block_alloca(the_function, arg.getName());
+        Builder.CreateStore(&arg, alloca);
+        NamedValues[arg.getName()] = alloca;
     }
 
     if (auto ret_val = body_->codegen())
