@@ -25,6 +25,7 @@
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Transforms/Utils.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetMachine.h"
 
@@ -75,6 +76,9 @@ inline void initialize_module_and_pass_manager()
     TheFPM->add(llvm::createReassociatePass());
     TheFPM->add(llvm::createGVNPass());
     TheFPM->add(llvm::createCFGSimplificationPass());
+    TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
+    TheFPM->add(llvm::createInstructionCombiningPass());
+    TheFPM->add(llvm::createReassociatePass());
 
     TheFPM->doInitialization();
 }
