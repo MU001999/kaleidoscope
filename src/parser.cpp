@@ -282,6 +282,14 @@ unique_ptr<ExprAST> Parser::parse_for_expr()
 unique_ptr<ExprAST> Parser::parse_var_expr()
 {
     get_next_token();
+
+    vector<pair<string, unique_ptr<ExprAST>>> var_names;
+
+    if (cur_token_.type() != Token::IDENTIFIER)
+    {
+        return log_error("expected identifier after var");
+    }
+
     // ...
 }
 
