@@ -13,22 +13,24 @@ namespace kaleidoscope
 {
 list<size_t> Parser::precedences_
 {
-    10, 20, 40
+    2, 10, 20, 40
 };
 
 unordered_map<size_t, set<char>> Parser::precedence_symbols_
 {
+    {  2, { '=' } },
     { 10, { '<' } },
     { 20, { '+', '-' } },
-    { 40, { '*' } }
+    { 40, { '*' } },
 };
 
 unordered_map<char, size_t> Parser::symbol_precedences_
 {
+    { '=',  2 },
     { '<', 10 },
     { '+', 20 },
     { '-', 20 },
-    { '*', 40 }
+    { '*', 40 },
 };
 
 void Parser::main_loop()
