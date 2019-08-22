@@ -59,6 +59,30 @@ Value *UnaryExprAST::codegen()
 
 Value *BinaryExprAST::codegen()
 {
+    if (op_ == '=')
+    {
+        auto lhs = dynamic_cast<VariableExprAST*>(lhs_.get());
+        if (!lhs)
+        {
+            return log_error_v("destination of '=' must be a variable");
+        }
+
+        auto val = rhs_->codegen();
+        if (!val)
+        {
+            return nullptr;
+        }
+
+        auto variable = NamedValues[lhs->get_name()];
+        if (!variable)
+        {
+            return log_error_v("Unknown variable name");
+        }
+
+        Builder.CreateStore(val, variable);
+        return val;
+    }
+
     auto lhs = lhs_->codegen();
     auto rhs = rhs_->codegen();
     if (!lhs || !rhs)
