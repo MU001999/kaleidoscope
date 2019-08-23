@@ -292,7 +292,49 @@ unique_ptr<ExprAST> Parser::parse_var_expr()
         return log_error("expected identifier after var");
     }
 
-    // ...
+    while (true)
+    {
+        auto name = cur_token_.value();
+        get_next_token();
+
+        unique_ptr<ExprAST> init;
+        if (cur_token_.type() == '=')
+        {
+            get_next_token();
+            init = parse_expression();
+            if (!init)
+            {
+                return nullptr;
+            }
+        }
+
+        var_names.push_back(make_pair(name, move(init)));
+
+        if (cur_token_.type() != ',')
+        {
+            break;
+        }
+        get_next_token();
+
+        if (cur_token_.type() != Token::IDENTIFIER)
+        {
+            return log_error("expected identifier list after var");
+        }
+    }
+
+    if (cur_token_.type() != Token::IN)
+    {
+        return log_error("expected 'in' keyword after 'var'");
+    }
+    get_next_token();
+
+    auto body = parse_expression();
+    if (!body)
+    {
+        return nullptr;
+    }
+
+    return make_unique<VarExprAST>(move(var_names), move(body));
 }
 
 unique_ptr<PrototypeAST> Parser::parse_extern()
