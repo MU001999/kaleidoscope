@@ -238,7 +238,41 @@ Value *ForExprAST::codegen()
 
 Value *VarExprAST::codegen()
 {
-    // ...
+    auto old_bindings = NamedValues;
+    auto the_function = Builder.GetInsertBlock()->getParent();
+
+    for (const auto &varname_exprast : var_names_)
+    {
+        const auto &var_name = varname_exprast.first;
+        auto init = varname_exprast.second.get();
+        Value *init_val;
+        if (init)
+        {
+            init_val = init->codegen();
+            if (!init_val)
+            {
+                return nullptr;
+            }
+        }
+        else
+        {
+            init_val = ConstantFP::get(TheContext, APFloat(0.0));
+        }
+
+        auto alloca = create_entry_block_alloca(the_function, var_name);
+        Builder.CreateStore(init_val, alloca);
+
+        NamedValues[var_name] = alloca;
+    }
+
+    auto body = body_->codegen();
+    if (!body)
+    {
+        return nullptr;
+    }
+
+    NamedValues = old_bindings;
+    return body;
 }
 
 Function *PrototypeAST::codegen()
