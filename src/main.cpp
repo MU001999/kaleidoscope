@@ -6,9 +6,11 @@ using namespace std;
 using namespace llvm;
 using namespace kaleidoscope;
 
+bool check_args(int argc, char *argv[]);
+
 int main(int argc, char *argv[])
 {
-    Interpret = (argc == 1);
+    Interpret = check_args(argc, argv);
 
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
@@ -20,4 +22,9 @@ int main(int argc, char *argv[])
     Parser().main_loop();
 
     return 0;
+}
+
+bool check_param(int argc, char *argv[])
+{
+    return argc > 1;
 }

@@ -450,8 +450,11 @@ void Parser::handle_definition()
             fprintf(stderr, "\n");
             */
 
-            TheJIT->addModule(move(TheModule));
-            initialize_module_and_pass_manager();
+            if (Interpret)
+            {
+                TheJIT->addModule(move(TheModule));
+                initialize_module_and_pass_manager();
+            }
         }
     }
     else
@@ -493,17 +496,20 @@ void Parser::handle_top_level_expression()
             fprintf(stderr, "\n");
             */
 
-            auto h = TheJIT->addModule(move(TheModule));
-            initialize_module_and_pass_manager();
+            if (Interpret)
+            {
+                auto h = TheJIT->addModule(move(TheModule));
+                initialize_module_and_pass_manager();
 
-            auto expr_symbol = TheJIT->findSymbol("__anno_expr");
-            assert(expr_symbol && "Function not found");
+                auto expr_symbol = TheJIT->findSymbol("__anno_expr");
+                assert(expr_symbol && "Function not found");
 
-            auto fp = (double (*)())expr_symbol.getAddress().get();
-            // fprintf(stderr, "Evaluated to %f\n", fp());
-            fprintf(stderr, "%f\n", fp());
+                auto fp = (double (*)())expr_symbol.getAddress().get();
+                // fprintf(stderr, "Evaluated to %f\n", fp());
+                fprintf(stderr, "%f\n", fp());
 
-            TheJIT->removeModule(h);
+                TheJIT->removeModule(h);
+            }
         }
     }
     else
