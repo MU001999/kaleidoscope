@@ -299,6 +299,10 @@ Function *FunctionAST::codegen()
     {
         return nullptr;
     }
+    else if (!the_function->empty())
+    {
+        the_function->getBasicBlockList().clear();
+    }
 
     if (proto.is_binary_op())
     {
