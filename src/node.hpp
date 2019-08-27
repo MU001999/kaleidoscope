@@ -70,7 +70,10 @@ inline llvm::Function *log_error_f(const char *str)
 inline void initialize_module_and_pass_manager()
 {
     TheModule = llvm::make_unique<llvm::Module>("My cool jit", TheContext);
-    TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
+    if (Interpret)
+    {
+        TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
+    }
 
     TheFPM = llvm::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
 

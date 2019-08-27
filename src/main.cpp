@@ -12,14 +12,22 @@ int main(int argc, char *argv[])
 {
     Interpret = check_args(argc, argv);
 
-    InitializeNativeTarget();
-    InitializeNativeTargetAsmPrinter();
-    InitializeNativeTargetAsmParser();
+    if (Interpret)
+    {
+        InitializeNativeTarget();
+        InitializeNativeTargetAsmPrinter();
+        InitializeNativeTargetAsmParser();
+        TheJIT = llvm::make_unique<orc::KaleidoscopeJIT>();
+    }
 
-    TheJIT = llvm::make_unique<orc::KaleidoscopeJIT>();
     initialize_module_and_pass_manager();
 
     Parser().main_loop();
+
+    if (!Interpret)
+    {
+        // ... emit code
+    }
 
     return 0;
 }
