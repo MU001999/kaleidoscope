@@ -26,7 +26,14 @@ int main(int argc, char *argv[])
 
     if (!Interpret)
     {
-        // ... emit code
+        InitializeAllTargetInfos();
+        InitializeAllTargets();
+        InitializeAllTargetMCs();
+        InitializeAllAsmParsers();
+        InitializeAllAsmPrinters();
+
+        auto target_triple = sys::getDefaultTargetTriple();
+        TheModule->setTargetTriple(target_triple);
     }
 
     return 0;
