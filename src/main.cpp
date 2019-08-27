@@ -34,6 +34,15 @@ int main(int argc, char *argv[])
 
         auto target_triple = sys::getDefaultTargetTriple();
         TheModule->setTargetTriple(target_triple);
+
+        string error;
+        auto target = TargetRegistry::lookupTarget(target_triple, error);
+
+        if (!target)
+        {
+            errs() << error;
+            return 1;
+        }
     }
 
     return 0;
