@@ -8,7 +8,7 @@ using namespace kaleidoscope;
 
 int main(int argc, char *argv[])
 {
-    interpret = (argc == 1);
+    Interpret = (argc == 1);
 
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();

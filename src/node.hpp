@@ -41,7 +41,7 @@ inline std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
 inline std::map<std::string, llvm::AllocaInst*> NamedValues;
 inline std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
 
-inline bool interpret;
+inline bool Interpret;
 
 inline std::unique_ptr<class ExprAST> log_error(const char *str)
 {
