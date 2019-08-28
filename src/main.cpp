@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     legacy::PassManager pass;
     auto file_type = TargetMachine::CGFT_ObjectFile;
 
-    if (the_target_machine->addPassesToEmitFile(pass, dest, nullptr, file_type));
+    if (the_target_machine->addPassesToEmitFile(pass, dest, nullptr, file_type))
     {
         errs() << "TheTargetMachine can't emit a file of this type";
         return 1;
