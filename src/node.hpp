@@ -98,7 +98,7 @@ inline llvm::AllocaInst *create_entry_block_alloca(llvm::Function *the_function,
 {
     llvm::IRBuilder<> tmp_b(&the_function->getEntryBlock(),
         the_function->getEntryBlock().begin());
-    return tmp_b.CreateAlloca(llvm::Type::getDoubleTy(TheContext), 0, var_name.c_str());
+    return tmp_b.CreateAlloca(llvm::Type::getDoubleTy(TheContext), 0, var_name);
 }
 
 // ExprAST - Base class for all expression nodes
