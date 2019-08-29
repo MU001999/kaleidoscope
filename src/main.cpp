@@ -1,3 +1,5 @@
+#include <tuple>
+
 #include "node.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
@@ -6,11 +8,12 @@ using namespace std;
 using namespace llvm;
 using namespace kaleidoscope;
 
-bool check_args(int argc, char *argv[]);
+tuple<bool, const char*, const char*> check_args(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
-    Interpret = check_args(argc, argv);
+    auto [res, infile, outfile] = check_args(argc, argv);
+    Interpret = res;
 
     if (Interpret)
     {
@@ -18,6 +21,12 @@ int main(int argc, char *argv[])
         InitializeNativeTargetAsmPrinter();
         InitializeNativeTargetAsmParser();
         TheJIT = llvm::make_unique<orc::KaleidoscopeJIT>();
+    }
+    else
+    {
+        freopen(infile, "r", stdin);
+        freopen("/dev/null", "w", stdout);
+        freopen("/dev/null", "w", stderr);
     }
 
     initialize_module_and_pass_manager();
@@ -56,9 +65,8 @@ int main(int argc, char *argv[])
 
     TheModule->setDataLayout(the_target_machine->createDataLayout());
 
-    auto filename = "output.o"s;
     std::error_code ec;
-    raw_fd_ostream dest(filename, ec, sys::fs::OF_None);
+    raw_fd_ostream dest(outfile, ec, sys::fs::OF_None);
 
     if (ec)
     {
@@ -78,12 +86,19 @@ int main(int argc, char *argv[])
     pass.run(*TheModule);
     dest.flush();
 
-    outs() << "Wrote " << filename << "\n";
+    // outs() << "Wrote " << outfile << "\n";
 
     return 0;
 }
 
-bool check_args(int argc, char *argv[])
+tuple<bool, const char*, const char*> check_args(int argc, char *argv[])
 {
-    return argc == 1;
+    if (argc == 1)
+    {
+        return make_tuple(true, nullptr, nullptr);
+    }
+    else
+    {
+        return make_tuple(false, argv[2], argv[4]);
+    }
 }
