@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     {
         freopen(infile, "r", stdin);
         freopen("/dev/null", "w", stdout);
-        freopen("/dev/null", "w", stderr);
+        // freopen("/dev/null", "w", stderr);
     }
 
     initialize_module_and_pass_manager();

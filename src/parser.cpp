@@ -35,7 +35,7 @@ unordered_map<char, size_t> Parser::symbol_precedences_
 
 void Parser::main_loop()
 {
-    fprintf(stderr, "ready> ");
+    fprintf(stdout, "ready> ");
     get_next_token();
     while (true)
     {
@@ -48,15 +48,15 @@ void Parser::main_loop()
             break;
         case Token::DEF:
             handle_definition();
-            fprintf(stderr, "ready> ");
+            fprintf(stdout, "ready> ");
             break;
         case Token::EXTERN:
             handle_extern();
-            fprintf(stderr, "ready> ");
+            fprintf(stdout, "ready> ");
             break;
         default:
             handle_top_level_expression();
-            fprintf(stderr, "ready> ");
+            fprintf(stdout, "ready> ");
             break;
         }
     }
@@ -445,9 +445,9 @@ void Parser::handle_definition()
         if (auto fn_ir = fn_ast->codegen())
         {
             /*
-            fprintf(stderr, "Parsed a function definition\n");
+            fprintf(stdout, "Parsed a function definition\n");
             fn_ir->print(llvm::errs());
-            fprintf(stderr, "\n");
+            fprintf(stdout, "\n");
             */
 
             if (Interpret)
@@ -470,9 +470,9 @@ void Parser::handle_extern()
         if (auto proto_ir = proto_ast->codegen())
         {
             /*
-            fprintf(stderr, "Parsed an extern\n");
+            fprintf(stdout, "Parsed an extern\n");
             proto_ir->print(llvm::errs());
-            fprintf(stderr, "\n");
+            fprintf(stdout, "\n");
             */
 
             FunctionProtos[proto_ast->get_name()] = move(proto_ast);
@@ -491,9 +491,9 @@ void Parser::handle_top_level_expression()
         if (auto fn_ir = fn_ast->codegen())
         {
             /*
-            fprintf(stderr, "Read top-level expression\n");
+            fprintf(stdout, "Read top-level expression\n");
             fn_ir->print(llvm::errs());
-            fprintf(stderr, "\n");
+            fprintf(stdout, "\n");
             */
 
             if (Interpret)
@@ -505,8 +505,8 @@ void Parser::handle_top_level_expression()
                 assert(expr_symbol && "Function not found");
 
                 auto fp = (double (*)())expr_symbol.getAddress().get();
-                // fprintf(stderr, "Evaluated to %f\n", fp());
-                fprintf(stderr, "%f\n", fp());
+                // fprintf(stdout, "Evaluated to %f\n", fp());
+                fprintf(stdout, "%f\n", fp());
 
                 TheJIT->removeModule(h);
             }
