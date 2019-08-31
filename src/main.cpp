@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
     if (the_target_machine->addPassesToEmitFile(pass, dest, nullptr, file_type))
     {
-        errs() << "TheTargetMachine can't emit a file of this type";
+        errs() << "The target machine can't emit a file of this type";
         return 1;
     }
 
