@@ -3,6 +3,7 @@
 #include "node.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "argparse.hpp"
 
 using namespace std;
 using namespace llvm;
@@ -93,6 +94,7 @@ int main(int argc, char *argv[])
 
 tuple<bool, const char*, const char*> check_args(int argc, char *argv[])
 {
+    /*
     if (argc == 1)
     {
         return make_tuple(true, nullptr, nullptr);
@@ -101,4 +103,9 @@ tuple<bool, const char*, const char*> check_args(int argc, char *argv[])
     {
         return make_tuple(false, argv[2], argv[4]);
     }
+    */
+
+    using namespace argparse;
+
+    ArgumentParser program("kaleidoscope");
 }
