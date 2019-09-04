@@ -105,7 +105,6 @@ tuple<bool, const char*, const char*> check_args(int argc, char *argv[])
     }
     */
 
-    using namespace argparse;
+    argparse::ArgumentParser program("kaleidoscope");
 
-    ArgumentParser program("kaleidoscope");
 }
