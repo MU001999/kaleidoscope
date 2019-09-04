@@ -1,4 +1,5 @@
 #include <tuple>
+#include <iostream>
 
 #include "node.hpp"
 #include "lexer.hpp"
@@ -9,11 +10,11 @@ using namespace std;
 using namespace llvm;
 using namespace kaleidoscope;
 
-tuple<bool, const char*, const char*> check_args(int argc, char *argv[]);
+tuple<bool, string, string> args_parse(int argc, char *agrv[]);
 
 int main(int argc, char *argv[])
 {
-    auto [res, infile, outfile] = check_args(argc, argv);
+    auto [res, infile, outfile] = args_parse(argc, argv);
     Interpret = res;
 
     if (Interpret)
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        freopen(infile, "r", stdin);
+        freopen(infile.c_str(), "r", stdin);
         freopen("/dev/null", "w", stdout);
         // freopen("/dev/null", "w", stderr);
     }
@@ -92,19 +93,39 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-tuple<bool, const char*, const char*> check_args(int argc, char *argv[])
+tuple<bool, string, string> args_parse(int argc, char *argv[])
 {
-    /*
-    if (argc == 1)
-    {
-        return make_tuple(true, nullptr, nullptr);
-    }
-    else
-    {
-        return make_tuple(false, argv[2], argv[4]);
-    }
-    */
-
     argparse::ArgumentParser program("kaleidoscope");
 
+    program.add_argument("input_file")
+        .help("files ready to compile")
+        .default_value(""s)
+        .action([](const string &value) { return value; });
+
+    program.add_argument("-c", "--compile")
+        .help("files ready to compile")
+        .default_value(""s)
+        .action([](const string &value) { return value; });
+
+    program.add_argument("-o")
+        .help("file to output")
+        .default_value("a.o"s)
+        .action([](const string &value) { return value; });
+
+    try
+    {
+        program.parse_args(argc, argv);
+    }
+    catch (const runtime_error &err)
+    {
+        cout << err.what() << endl;
+        program.print_help();
+        exit(0);
+    }
+
+    auto input_file = program.get("input_file").empty()
+                    ? program.get("-c")
+                    : program.get("input_file");
+
+    return make_tuple(input_file.empty(), input_file, program.get("-o"));
 }
