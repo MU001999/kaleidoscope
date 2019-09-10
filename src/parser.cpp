@@ -35,6 +35,13 @@ unordered_map<char, size_t> Parser::symbol_precedences_
 
 void Parser::main_loop()
 {
+    fprintf(stdout, R"( _         _      _     _
+| | ____ _| | ___(_) __| | ___  ___  ___ ___  _ __   ___
+| |/ / _` | |/ _ \ |/ _` |/ _ \/ __|/ __/ _ \| '_ \ / _ \
+|   < (_| | |  __/ | (_| | (_) \__ \ (_| (_) | |_) |  __/
+|_|\_\__,_|_|\___|_|\__,_|\___/|___/\___\___/| .__/ \___|
+                                             |_|
+)");
     fprintf(stdout, "ready> ");
     get_next_token();
     while (true)
