@@ -41,6 +41,9 @@ void Parser::main_loop()
 |   < (_| | |  __/ | (_| | (_) \__ \ (_| (_) | |_) |  __/
 |_|\_\__,_|_|\___|_|\__,_|\___/|___/\___\___/| .__/ \___|
                                              |_|
+
+See more on https://llvm.org/docs/tutorial/MyFirstLanguageFrontend
+
 )");
     fprintf(stdout, "ready> ");
     get_next_token();
